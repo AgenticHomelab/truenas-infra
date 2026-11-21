@@ -25,6 +25,14 @@ Existing stable service credentials remain authoritative in OCI Vault;
 protected runtime copies, provider key files, backend selectors and
 independent recovery credentials are managed outside public Git.
 
+For an authorized source cutover, select the root's existing S3 credential
+profile in the OpenTofu process and clear inherited AWS access-key overrides.
+An ACME configuration without a stored profile can use the approved local
+profile through `AWS_PROFILE`. First run `tofu state list` from the original
+initialized root. Once that succeeds, reuse the original protected backend
+configuration for the new checkout and verify the same state lineage and
+resource addresses. Keep backend settings and state outside Git.
+
 Each OpenTofu root retains its own independently protected OCI Object Storage
 backend, state lineage and native lockfile. **Do not initialize against
 production state, import, plan or apply** merely to verify publication.
