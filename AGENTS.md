@@ -22,7 +22,7 @@ relevant public runbooks before changes; default to read-only investigation.
 - Do not assert successful backup, deployment or restored runtime health from
   Git desired state or offline CI.
 - The public source has been published after a separate clean-history review;
-  this does not replace existing private production execution paths. A runtime
-  source switch needs separately reviewed operator approval, complete approved
+  the public roots are selected for normal execution. A subsequent source
+  switch needs separately reviewed operator approval, complete approved
   protected inputs, exact original backends/locks, refreshed no-unexpected-change
   plans, and appropriate independent recovery and rollback.
