@@ -49,10 +49,10 @@ remote-state recovery, or a no-change production plan. All such operational
 checks require separately authorized access and a reviewed rollback plan.
 
 This is the published, clean-history public TrueNAS desired-state source.
-Operator-reported preflight compared all three roots with their original
-remote states and obtained fresh locked, refreshing plans proposing no
-changes. The existing private production execution paths remain in use until
-an explicitly approved consumer cutover; a matching plan does not itself
-switch a scheduled job or authorize apply. The original private repository
-and operational evidence remain private. Independent off-host restoration
-and recovery-copy retrieval were not demonstrated by this preflight.
+The operator workstation uses the public ACME and identities roots. The
+authorized storage runner uses the public storage root. Each selected path
+matched its original state and produced a locked, refreshing plan with zero
+proposed changes. Apply requires separate authorization. The original
+private repository provides rollback and retains its operational evidence.
+Independent off-host restoration and Vaultwarden recovery retrieval remain
+unverified.
