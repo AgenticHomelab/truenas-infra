@@ -48,7 +48,11 @@ and synthetic native provider tests. It never proves actual NAS health,
 remote-state recovery, or a no-change production plan. All such operational
 checks require separately authorized access and a reviewed rollback plan.
 
-The current source is a publication candidate, not release authorization.
-Any new public repository must be initialized with a new history-free root
-commit after complete content and metadata review. The existing private
-repository and original operational evidence remain private.
+This is the published, clean-history public TrueNAS desired-state source.
+Operator-reported preflight compared all three roots with their original
+remote states and obtained fresh locked, refreshing plans proposing no
+changes. The existing private production execution paths remain in use until
+an explicitly approved consumer cutover; a matching plan does not itself
+switch a scheduled job or authorize apply. The original private repository
+and operational evidence remain private. Independent off-host restoration
+and recovery-copy retrieval were not demonstrated by this preflight.
