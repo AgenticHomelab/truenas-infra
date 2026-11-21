@@ -1,0 +1,28 @@
+# Local credentials and environment
+.env
+.env.*
+!.env.example
+*.auto.tfvars
+*.tfvars
+*.tfvars.json
+
+# OpenTofu backend and working data
+backend.hcl
+*.backend.hcl
+.terraform/
+*.tfstate
+*.tfstate.*
+*.plan
+*.tfplan
+crash.log
+crash.*.log
+*.log
+
+# Editor and temporary artifacts
+*.swp
+*.tmp
+.DS_Store
+
+# Operator-only import/override configuration containing live resource metadata
+*.private.tf
+*.import.tf

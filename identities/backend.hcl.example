@@ -1,0 +1,17 @@
+# External private S3-compatible OCI Object Storage configuration.
+# Copy to an ignored file and verify this root uses a different state key
+# from acme/ and storage/. Never commit real settings or credentials.
+bucket = "example-state-bucket"
+key    = "example/truenas/identities/terraform.tfstate"
+region = "example-region-1"
+
+endpoints = {
+  s3 = "https://OBJECT_STORAGE_NAMESPACE.compat.objectstorage.example-region-1.oraclecloud.com"
+}
+
+skip_region_validation      = true
+skip_credentials_validation = true
+skip_requesting_account_id  = true
+skip_metadata_api_check     = true
+skip_s3_checksum            = true
+use_path_style              = true

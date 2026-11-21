@@ -1,0 +1,125 @@
+name: Validate OpenTofu source
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'acme/**'
+      - 'identities/**'
+      - 'storage/**'
+      - 'docs/adoption.md'
+      - 'docs/garage-backup.md'
+      - '.github/workflows/validate.yml'
+      - '.gitignore'
+      - 'AGENTS.md'
+      - 'README.md'
+      - 'publication/**'
+      - 'tests/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tofu-validate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Install checksum-pinned OpenTofu
+        shell: bash
+        env:
+          TOFU_ARCHIVE_SHA256: 5dc43da4f750f33873dc25e94587128709e819e544b7be9016b255316153c3a8 # pragma: allowlist secret
+        run: |
+          set -euo pipefail
+          archive="${RUNNER_TEMP}/tofu.zip"
+          curl --fail --silent --show-error --location \
+            --proto '=https' --tlsv1.2 \
+            https://github.com/opentofu/opentofu/releases/download/v1.12.6/tofu_1.12.6_linux_amd64.zip \
+            --output "$archive"
+          printf '%s  %s\n' "$TOFU_ARCHIVE_SHA256" "$archive" | sha256sum --check --status
+          mkdir -p "${RUNNER_TEMP}/tofu"
+          unzip -q "$archive" tofu -d "${RUNNER_TEMP}/tofu"
+          echo "${RUNNER_TEMP}/tofu" >> "$GITHUB_PATH"
+
+      - name: Validate without production backend or credentials
+        shell: bash
+        env:
+          TF_IN_AUTOMATION: '1'
+          TF_INPUT: '0'
+          CHECKPOINT_DISABLE: '1'
+        run: |
+          set -euo pipefail
+          # Exercise both source and *relocated* public layouts before validation.
+          assemble() {
+            local source_root="$1" output_root="$2"
+            mkdir -p "$output_root"
+            (
+              cd "$source_root"
+              while IFS= read -r rel || [[ -n "$rel" ]]; do
+                [[ -z "$rel" || "$rel" == "#"* ]] && continue
+                [[ "$rel" != /* && "$rel" != *../* && "$rel" != ../* ]]
+                source="$rel"
+                target="$rel"
+                case "$rel" in
+                  publication/README.public.md)
+                    target="README.md"
+                    [[ -f "$source" ]] || source="README.md"
+                    ;;
+                  publication/AGENTS.public.md)
+                    target="AGENTS.md"
+                    [[ -f "$source" ]] || source="AGENTS.md"
+                    ;;
+                  publication/garage-backup.public.md)
+                    target="docs/garage-backup.md"
+                    [[ -f "$source" ]] || source="docs/garage-backup.md"
+                    ;;
+                esac
+                test -f "$source"
+                mkdir -p "$output_root/$(dirname "$target")"
+                cp -- "$source" "$output_root/$target"
+              done < publication/candidate-files.txt
+            )
+            # The public export manifest must name the relocated files,
+            # not preparation-only inputs retained by the private source.
+            sed -i \
+              -e 's@^publication/README.public.md$@README.md@' \
+              -e 's@^publication/AGENTS.public.md$@AGENTS.md@' \
+              -e 's@^publication/garage-backup.public.md$@docs/garage-backup.md@' \
+              "$output_root/publication/candidate-files.txt"
+            test -f "$output_root/README.md"
+            test -f "$output_root/AGENTS.md"
+            test ! -e "$output_root/.git"
+          }
+          candidate="$RUNNER_TEMP/public-candidate"
+          assemble "$GITHUB_WORKSPACE" "$candidate"
+          public_rebuilt="$RUNNER_TEMP/public-reassembled"
+          assemble "$candidate" "$public_rebuilt"
+          diff -rq "$candidate" "$public_rebuilt"
+          cd "$candidate"
+          python3 -m unittest discover -s tests -p 'test_public_export.py' -v
+          for root in acme identities storage; do
+            tofu -chdir="$root" fmt -diff -check
+            tofu -chdir="$root" init -backend=false -input=false -lockfile=readonly
+            tofu -chdir="$root" validate
+            test ! -f "$root/terraform.tfstate"
+          done
+          tofu -chdir=storage test -no-color
+          python3 -c 'import ast, pathlib; ast.parse(pathlib.Path("storage/tests/garage_copy_generation.py").read_text())'
+          test ! -f storage/terraform.tfstate
+
+      - name: Check candidate public export scope offline
+        run: python3 -m unittest discover -s tests -p 'test_public_export.py' -v
+
+      - name: Independently scan exact history-free candidate
+        shell: bash
+        run: bash tests/scan_public_export.sh
