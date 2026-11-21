@@ -1,4 +1,4 @@
-# Private noncredential inputs for a clean-history public source
+# Private noncredential inputs for the public TrueNAS source
 
 The TrueNAS resource implementation remains in this repository. Approved
 production-specific endpoint and Cloud Backup values are held in the private
@@ -26,9 +26,12 @@ remain supplied independently. Do not log, commit, copy into state, or
 redistribute those secret values. OCI Vault stays the authority for stable
 credentials. The private source does not trigger live reconciliation.
 
-**Draft-only gates:** confirm actual value equivalence, unchanged state
-lineage, exact backend/lock settings, full refreshing no-change plans under
-separate authorization, offline CI, history scan, and all documentation/metadata
-redaction before any public export. This source-only PR is not deployment
-permission and should not be merged before the private input contract is
-reviewed.
+**Execution-path gates:** the public source has been released as a separate
+history-free export. Operator-reported source validation confirmed matching
+original backends, lineages and locked, refreshing no-change plans for all
+three roots, not a production job switch. Any new consumer must still use
+complete private inputs, the existing credential authorities and original
+backend/lock settings, with a reviewed rollback and independent recovery path.
+Off-host restoration and Vaultwarden recovery-copy retrieval were not proven
+by this preflight. Source publication and documentation merges are not
+permissions for apply, import, credential rotation or state migration.
