@@ -21,6 +21,8 @@ hostname-verified TrueNAS API endpoint, selected WebDAV metadata and an
 existing backup source path. Use a protected operator checkout with native
 OpenTofu `-var-file` where appropriate. See the
 [private input contract](docs/private-publication-inputs.md) for each root.
+See [adoption and state recovery](docs/adoption.md) for the existing backend
+and storage ownership boundaries.
 
 Existing stable service credentials remain authoritative in OCI Vault;
 protected runtime copies, provider key files, backend selectors and
