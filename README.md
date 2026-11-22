@@ -19,7 +19,8 @@ Approved private, noncredential input files are stored in the private
 `AgenticHomelab/homelab-secrets` repository. These include the full
 hostname-verified TrueNAS API endpoint, selected WebDAV metadata and an
 existing backup source path. Use a protected operator checkout with native
-OpenTofu `-var-file` where appropriate.
+OpenTofu `-var-file` where appropriate. See the
+[private input contract](docs/private-publication-inputs.md) for each root.
 
 Existing stable service credentials remain authoritative in OCI Vault;
 protected runtime copies, provider key files, backend selectors and
@@ -38,8 +39,8 @@ backend, state lineage and native lockfile. **Do not initialize against
 production state, import, plan or apply** merely to verify publication.
 
 The [Garage backup protection guide](docs/garage-backup.md) explains why
-snapshots, encrypted copies and verified restoration are distinct controls,
-and why the offsite SYNC must remain separately gated.
+snapshots, encrypted copies and verified restoration are distinct controls.
+The homelab's Cloud Sync task is enabled.
 
 ## Validation and safety
 
