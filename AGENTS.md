@@ -4,6 +4,13 @@ This repository is the published, clean-history **public desired-state
 source** for approved TrueNAS infrastructure. Review current source and
 relevant public runbooks before changes; default to read-only investigation.
 
+**The cross-repository source migration is closed (2026-11-22).** This is the
+accepted execution source for the selected TrueNAS OpenTofu roots. The original
+`antief/*` repositories are private historical archives, not required runtime
+or recovery inputs. Do not interpret dated adoption or cutover notes as a
+pending source migration; future TrueNAS changes require their normal review,
+state, locking and recovery gates.
+
 - Use English for code, comments, and documentation; Conventional Commits.
 - Use focused PRs; do not push directly to `main`.
 - OpenTofu owns only adopted stable TrueNAS infrastructure. TrueNAS CSI owns
