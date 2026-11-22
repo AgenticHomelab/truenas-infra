@@ -1,0 +1,3 @@
+Temporary Hermes GitHub contribution access acceptance fixture.
+Synthetic text only; no production configuration or credentials.
+Do not merge. Close the test PR and delete its branch after verification.
