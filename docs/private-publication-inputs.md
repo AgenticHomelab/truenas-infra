@@ -26,12 +26,13 @@ remain supplied independently. Do not log, commit, copy into state, or
 redistribute those secret values. OCI Vault stays the authority for stable
 credentials. The private source does not trigger live reconciliation.
 
-**Execution-path gates:** the public source has been released as a separate
-history-free export. Operator-reported source validation confirmed matching
-original backends, lineages and locked, refreshing no-change plans for all
-three roots, not a production job switch. Any new consumer must still use
-complete private inputs, the existing credential authorities and original
-backend/lock settings, with a reviewed rollback and independent recovery path.
-Off-host restoration and Vaultwarden recovery-copy retrieval were not proven
-by this preflight. Source publication and documentation merges are not
-permissions for apply, import, credential rotation or state migration.
+The operator workstation uses the public ACME and identities roots, and
+Hermes uses the public storage root. Operator-reported acceptance confirmed
+matching original backends and lineages and locked, refreshing no-change
+plans for all three roots. The original private source remains available for rollback.
+
+Any future source switch requires complete private inputs, the existing
+credential authorities and original backend and lock settings, with a
+reviewed rollback and independent recovery path. Off-host restoration and
+Vaultwarden recovery-copy retrieval remain unverified. Apply, import,
+credential rotation and state migration require separate authorization.
