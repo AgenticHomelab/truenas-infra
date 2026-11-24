@@ -5,13 +5,11 @@ python3 -m venv "$RUNNER_TEMP/security-venv"
 "$RUNNER_TEMP/security-venv/bin/pip" install --disable-pip-version-check detect-secrets==1.5.0
 mkdir -p "$RUNNER_TEMP/public-tools"
 GOBIN="$RUNNER_TEMP/public-tools" go install github.com/zricethezav/gitleaks/v8@v8.24.2
-cd "$RUNNER_TEMP/public-candidate"
+cd "$RUNNER_TEMP/public-security-tree"
 test ! -e .git
-# OpenTofu init created disposable provider caches after export validation.
-# Remove only these caches inside RUNNER_TEMP so scanners see export bytes.
 for root in acme identities storage; do
-  rm -rf -- "$root/.terraform"
   test ! -e "$root/.terraform"
+  test ! -e "$root/terraform.tfstate"
 done
 set +e
 "$RUNNER_TEMP/public-tools/gitleaks" dir . --redact --report-format json --report-path "$RUNNER_TEMP/gitleaks-public.json" > /dev/null 2>&1

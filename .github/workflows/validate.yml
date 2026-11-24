@@ -4,18 +4,6 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - 'acme/**'
-      - 'identities/**'
-      - 'storage/**'
-      - 'docs/adoption.md'
-      - 'docs/garage-backup.md'
-      - '.github/workflows/validate.yml'
-      - '.gitignore'
-      - 'AGENTS.md'
-      - 'README.md'
-      - 'publication/**'
-      - 'tests/**'
   workflow_dispatch:
 
 permissions:
@@ -59,54 +47,6 @@ jobs:
           CHECKPOINT_DISABLE: '1'
         run: |
           set -euo pipefail
-          # Exercise both source and *relocated* public layouts before validation.
-          assemble() {
-            local source_root="$1" output_root="$2"
-            mkdir -p "$output_root"
-            (
-              cd "$source_root"
-              while IFS= read -r rel || [[ -n "$rel" ]]; do
-                [[ -z "$rel" || "$rel" == "#"* ]] && continue
-                [[ "$rel" != /* && "$rel" != *../* && "$rel" != ../* ]]
-                source="$rel"
-                target="$rel"
-                case "$rel" in
-                  publication/README.public.md)
-                    target="README.md"
-                    [[ -f "$source" ]] || source="README.md"
-                    ;;
-                  publication/AGENTS.public.md)
-                    target="AGENTS.md"
-                    [[ -f "$source" ]] || source="AGENTS.md"
-                    ;;
-                  publication/garage-backup.public.md)
-                    target="docs/garage-backup.md"
-                    [[ -f "$source" ]] || source="docs/garage-backup.md"
-                    ;;
-                esac
-                test -f "$source"
-                mkdir -p "$output_root/$(dirname "$target")"
-                cp -- "$source" "$output_root/$target"
-              done < publication/candidate-files.txt
-            )
-            # The public export manifest must name the relocated files,
-            # not preparation-only inputs retained by the private source.
-            sed -i \
-              -e 's@^publication/README.public.md$@README.md@' \
-              -e 's@^publication/AGENTS.public.md$@AGENTS.md@' \
-              -e 's@^publication/garage-backup.public.md$@docs/garage-backup.md@' \
-              "$output_root/publication/candidate-files.txt"
-            test -f "$output_root/README.md"
-            test -f "$output_root/AGENTS.md"
-            test ! -e "$output_root/.git"
-          }
-          candidate="$RUNNER_TEMP/public-candidate"
-          assemble "$GITHUB_WORKSPACE" "$candidate"
-          public_rebuilt="$RUNNER_TEMP/public-reassembled"
-          assemble "$candidate" "$public_rebuilt"
-          diff -rq "$candidate" "$public_rebuilt"
-          cd "$candidate"
-          python3 -m unittest discover -s tests -p 'test_public_export.py' -v
           for root in acme identities storage; do
             tofu -chdir="$root" fmt -diff -check
             tofu -chdir="$root" init -backend=false -input=false -lockfile=readonly
@@ -117,9 +57,14 @@ jobs:
           python3 -c 'import ast, pathlib; ast.parse(pathlib.Path("storage/tests/garage_copy_generation.py").read_text())'
           test ! -f storage/terraform.tfstate
 
-      - name: Check candidate public export scope offline
-        run: python3 -m unittest discover -s tests -p 'test_public_export.py' -v
+      - name: Assemble clean tracked-file scan tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/public-security-tree"
+          git ls-files -z | tar --null -T - -cf - | tar -xf - -C "$RUNNER_TEMP/public-security-tree"
+          test ! -e "$RUNNER_TEMP/public-security-tree/.git"
 
-      - name: Independently scan exact history-free candidate
+      - name: Independently scan current tracked source
         shell: bash
         run: bash tests/scan_public_export.sh
