@@ -29,7 +29,9 @@ credentials. The private source does not trigger live reconciliation.
 The operator workstation uses the public ACME and identities roots, and
 Hermes uses the public storage root. Operator-reported acceptance confirmed
 matching original backends and lineages and locked, refreshing no-change
-plans for all three roots. The original private source remains available for rollback.
+plans for all three roots. Former private repositories are historical archives. Recover from current
+repository history, original backend selectors and independently protected
+inputs, not an old checkout.
 
 Any future source switch requires complete private inputs, the existing
 credential authorities and original backend and lock settings, with a

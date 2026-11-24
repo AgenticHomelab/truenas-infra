@@ -24,9 +24,12 @@ OpenTofu `-var-file` where appropriate. See the
 See [adoption and state recovery](docs/adoption.md) for the existing backend
 and storage ownership boundaries.
 
-Existing stable service credentials remain authoritative in OCI Vault;
-protected runtime copies, provider key files, backend selectors and
-independent recovery credentials are managed outside public Git.
+Existing stable service credentials remain authoritative in OCI Vault.
+The Kubernetes CSI API key is delivered by ESO to its existing Kubernetes
+Secret, under [Talos GitOps ownership](https://github.com/AgenticHomelab/talos-cluster/blob/main/kubernetes/infrastructure/truenas-csi/README.md).
+The 2026-11-24 migration preserved the CSI credential bytes and Secret UID.
+This does not change TrueNAS service identities, the OpenTofu provider keys,
+backend selectors, or independently protected recovery credentials.
 
 For an authorized source cutover, select the root's existing S3 credential
 profile in the OpenTofu process and clear inherited AWS access-key overrides.
@@ -55,7 +58,8 @@ This is the published, clean-history public TrueNAS desired-state source.
 The operator workstation uses the public ACME and identities roots. The
 authorized storage runner uses the public storage root. Each selected path
 matched its original state and produced a locked, refreshing plan with zero
-proposed changes. Apply requires separate authorization. The original
-private repository provides rollback and retains its operational evidence.
+proposed changes. Apply requires separate authorization. The former private source is an archive of historical evidence, not a runtime
+or recovery dependency. Use current Git history and independently protected
+execution inputs for recovery.
 Independent off-host restoration and Vaultwarden recovery retrieval remain
 unverified.

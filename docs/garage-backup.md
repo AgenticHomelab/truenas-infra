@@ -23,8 +23,8 @@ be enabled without the snapshot-policy switch.
 
 Cloud Sync reuses an existing credential by reference. The dedicated rclone
 crypt password and salt are ephemeral, sensitive execution inputs; keep
-them out of Git, OpenTofu state and TrueNAS-independent recovery copies.
-Custody must survive a complete NAS loss.
+them out of Git, OpenTofu state and application data exports. Retain them in
+separate protected recovery custody that survives complete NAS loss.
 
 The transfer is an encrypted PUSH with SYNC semantics. A completed SYNC
 removes destination files absent from the source. It is **not atomic**:
