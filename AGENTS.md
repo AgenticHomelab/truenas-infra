@@ -15,7 +15,8 @@ state, locking and recovery gates.
 - Use focused PRs; do not push directly to `main`.
 - OpenTofu owns only adopted stable TrueNAS infrastructure. TrueNAS CSI owns
   PVC children; native applications own mutable state; Flux owns Kubernetes
-  desired state; OCI OpenTofu and Ansible retain their separate owners.
+  desired state; ESO delivers the Kubernetes CSI credential from OCI Vault.
+  OCI OpenTofu and Ansible retain their separate owners.
 - Preserve the existing independent, versioned OCI S3 state backends, locks,
   resource addresses and provider versions. Never import, apply, force-unlock,
   migrate state or rotate credentials without separate explicit authorization.

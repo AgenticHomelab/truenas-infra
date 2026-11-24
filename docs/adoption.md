@@ -32,8 +32,10 @@ ACME metadata, adopted service identities, stable datasets and static exports,
 and specifically adopted native protection tasks belong to these roots.
 The existing CSI parent and its previously accepted service privilege are
 already in place. Keep the complete input maps and existing state addresses.
-The CSI driver retains ownership of its per-PVC datasets and exports. Native
-applications retain their own data, service credentials and lifecycle.
+The CSI driver retains ownership of its per-PVC datasets and exports. ESO
+synchronizes the existing Kubernetes CSI API Secret from OCI Vault; that
+consumer copy is not owned by these roots. Native applications retain their
+own data, native mutable credentials and lifecycle.
 
 For an explicitly approved additional parent, identify the exact existing
 ancestor and confirm encryption inheritance, owner identity, backup coverage
