@@ -45,7 +45,10 @@ production state, import, plan or apply** merely to verify publication.
 
 The [Garage backup protection guide](docs/garage-backup.md) explains why
 snapshots, encrypted copies and verified restoration are distinct controls.
-The homelab's Cloud Sync task is enabled.
+There are two distinct Cloud Sync tasks: the BorgWarehouse task is declared
+with `enabled = false`, while the separate Garage task uses the protected
+`garage_offsite_enabled` input. Preserve the accepted Garage activation inputs;
+public defaults do not establish either task's current live status.
 
 ## Validation and safety
 
