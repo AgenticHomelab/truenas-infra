@@ -13,15 +13,18 @@ OpenTofu declares only a bounded native snapshot policy and an optional
 encrypted Cloud Sync task. Do not import the application's mutable dataset
 or manage its lifecycle as a replaceable OpenTofu resource.
 
-The additive `garage_backup` snapshot policy is initially disabled and
-uses `prevent_destroy`. Existing snapshot-task maps must be supplied in
+The additive `garage_backup` snapshot policy defaults to disabled and
+uses `prevent_destroy`. Preserve the accepted protected activation inputs
+when recovering an existing execution root; do not substitute public defaults. Existing snapshot-task maps must be supplied in
 full from protected inputs: never replace the production map with an empty
 or Garage-only map. The transfer has a *separate* enable switch and cannot
 be enabled without the snapshot-policy switch.
 
 ## Crypt and offsite transfer
 
-Cloud Sync reuses an existing credential by reference. The dedicated rclone
+The Garage Cloud Sync task reuses the existing WebDAV credential by reference
+but is separate from the BorgWarehouse task, which is declared disabled in
+`storage/cloud_backup.tf`. The dedicated rclone
 crypt password and salt are ephemeral, sensitive execution inputs; keep
 them out of Git, OpenTofu state and application data exports. Retain them in
 separate protected recovery custody that survives complete NAS loss.

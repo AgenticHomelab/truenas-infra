@@ -22,9 +22,13 @@ tofu -chdir=storage plan \
 
 Existing complete protected root-specific tfvars, Vault-selected password,
 API key files, independent S3 backend selectors and execution identities must
-remain supplied independently. Do not log, commit, copy into state, or
-redistribute those secret values. OCI Vault stays the authority for stable
-credentials. The private source does not trigger live reconciliation.
+remain supplied independently. Preserve the approved Garage activation flags
+and independently held crypt inputs as part of the complete storage inputs.
+Do not log, commit or redistribute credential values. Sensitive provider
+configuration, including the WebDAV credential, may be present in protected
+state; sensitivity marking alone does not prevent persistence. The Garage
+crypt password and salt use ephemeral inputs and write-only provider fields
+instead. OCI Vault stays the authority for stable credentials. The private source does not trigger live reconciliation.
 
 The operator workstation uses the public ACME and identities roots, and
 Hermes uses the public storage root. Operator-reported acceptance confirmed
